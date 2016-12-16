@@ -74,7 +74,7 @@ function! gofmt#apply() abort
         call append(cur_line - 1, line[1:])
         let cur_line += 1
       elseif line[0] ==# '-'
-        execute cur_line 'delete _'
+        silent execute cur_line 'delete _'
       else
         let cur_line += 1
       endif
