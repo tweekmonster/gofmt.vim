@@ -5,4 +5,4 @@ augroup gofmt
         \ endif
 augroup END
 
-command -buffer Gofmt call gofmt#apply()
+command! -buffer Gofmt call gofmt#apply()
