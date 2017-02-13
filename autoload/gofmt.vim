@@ -51,7 +51,7 @@ function! gofmt#apply() abort
   setlocal nofoldenable
 
   normal! ix
-  normal! x
+  normal! "_x
   undojoin
 
   let view = winsaveview()
