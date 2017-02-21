@@ -3,8 +3,8 @@ let s:srcdir_bin = {}
 let s:hunk_pat = '^@@ -\(\d\+\),\?\(\d*\) +\(\d\+\),\?\(\d*\) @@'
 
 function! s:gofmt_cmd() abort
-  let exe = get(g:, 'gofmt_exe', 'gofmt')
-  if empty(exe)
+  let cmd = get(g:, 'gofmt_exe', 'gofmt')
+  if empty(cmd)
     if !s:exe_blank_warned
       let s:exe_blank_warned = 1
       echohl WarningMsg
@@ -14,24 +14,48 @@ function! s:gofmt_cmd() abort
     return ''
   endif
 
-  if !executable(exe)
+  let args = []
+
+  if type(cmd) == type('')
+    let exe = split(cmd)
+  else
+    let exe = ['gofmt']
+  endif
+
+  let pathsep = has('win32') ? ';' : ':'
+  let paths = []
+  if exists('$GOBIN')
+    let paths += [$GOBIN]
+  endif
+
+  if exists('$GOPATH')
+    let paths += map(split($GOPATH, pathsep), 'v:val . "/bin"')
+  endif
+
+  if !empty(paths)
+    let exe[0] = findfile(exe[0], join(filter(paths, '!empty(v:val)'), ','))
+  endif
+
+  if !executable(exe[0])
     echohl ErrorMsg
     echo '[gofmt.vim] can''t find command:' exe
     echohl None
     return ''
   endif
 
-  if !has_key(s:srcdir_bin, exe)
-    let s:srcdir_bin[exe] = system(exe . ' --help') =~# '-srcdir'
+  let resolved = join(exe)
+
+  if !has_key(s:srcdir_bin, resolved)
+    let s:srcdir_bin[resolved] = system(resolved . ' --help') =~# '-srcdir'
   endif
 
-  let args = '-d'
+  let args += ['-d']
 
-  if get(s:srcdir_bin, 'exe', 0)
-    let args .= printf(' -srcdir "%s"', expand('%:p'))
+  if get(s:srcdir_bin, resolved, 0)
+    let args += ['-srcdir', printf('"%s"', expand('%:p'))]
   endif
 
-  return printf('%s %s', exe, args)
+  return printf('%s %s', resolved, join(args, ' '))
 endfunction
 
 
