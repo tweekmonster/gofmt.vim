@@ -68,9 +68,11 @@ function! gofmt#apply() abort
   let input = getline(1, '$') + ['']
   let diff = split(system(cmd, input), "\n", 1)
   if v:shell_error != 0
-    echohl ErrorMsg
-    echo "gofmt errors!"
-    return
+    if g:gofmt_display_errors
+      echohl ErrorMsg
+      echo "gofmt errors!"
+      return ''
+    endif
   endif
 
   let fen = &l:foldenable
