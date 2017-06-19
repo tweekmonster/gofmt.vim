@@ -69,8 +69,8 @@ function! gofmt#apply() abort
   let output = system(cmd, input)
   let diff = split(output, "\n", 1)
   if v:shell_error != 0
-    if g:gofmt_display_errors
-      echohl ErrorMsg
+    if get(g:, 'gofmt_display_errors', 0)
+      echohl None
       echo output
       return ''
     endif
