@@ -80,7 +80,7 @@ function! gofmt#apply() abort
     if get(g:, 'gofmt_display_errors', 0)
       echohl ErrorMsg
       echo output
-      echohl None      
+      echohl None
       return ''
     endif
   endif
