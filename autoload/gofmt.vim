@@ -66,13 +66,21 @@ function! gofmt#apply() abort
   endif
 
   let input = getline(1, '$') + ['']
+
+  let list_cmd = cmd . ' -l'
+  let list_output = system(list_cmd, input)
+  if empty(list_output)
+    echo "gofmt: no changes"
+    return
+  endif
+
   let output = system(cmd, input)
   let diff = split(output, "\n", 1)
   if v:shell_error != 0
     if get(g:, 'gofmt_display_errors', 0)
       echohl ErrorMsg
       echo output
-      echohl None      
+      echohl None
       return ''
     endif
   endif
